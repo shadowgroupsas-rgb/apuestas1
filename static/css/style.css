@@ -1,59 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 :root {
-    --bg-dark: #0f172a;
-    --bg-card: #1e293b;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --accent-blue: #3b82f6;
-    --accent-green: #22c55e;
-    --accent-neon: #a3e635;
+    --color-bg-deep: #000000;
+    --color-bg-card: #0a0a0a;
+    --color-neon-cyan: #06b6d4;
+    --color-neon-purple: #a855f7;
+    --color-text-primary: #ffffff;
+    --color-text-muted: #a1a1aa;
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: var(--text-primary);
+    background-color: var(--color-bg-deep);
+    color: var(--color-text-primary);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
 }
 
-.card {
-    background-color: var(--bg-card);
-    border: 1px solid #334155;
-    transition: transform 0.2s, box-shadow 0.2s;
+/* Glassmorphism Utilities */
+.glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+.glass-header {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+/* Neon Effects */
+.neon-text-cyan {
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
 }
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+.neon-border {
+    position: relative;
+    z-index: 0;
 }
 
-.btn-neon {
-    background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
-    color: #0f172a;
-    font-weight: 800;
+.neon-border::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    background: linear-gradient(45deg, var(--color-neon-cyan), var(--color-neon-purple));
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.btn-neon:hover {
-    background: linear-gradient(135deg, #65a30d 0%, #4d7c0f 100%);
+.neon-border:hover::before {
+    opacity: 1;
 }
 
-/* Custom Scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 ::-webkit-scrollbar-track {
-    background: #0f172a;
+    background: #000;
 }
 ::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 4px;
+    background: #333;
+    border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #555;
+}
+
+/* Animated Background for Login */
+.bg-animated {
+    background: linear-gradient(-45deg, #000000, #0f172a, #1e1b4b, #000000);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.input-modern {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.input-modern:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-neon-cyan);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
 }

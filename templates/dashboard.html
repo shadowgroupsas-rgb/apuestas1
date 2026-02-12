@@ -3,191 +3,243 @@
 {% block title %}Dashboard - Sports AI{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-8">
-    <h1 class="text-3xl font-bold text-gray-100 flex items-center">
-        <i class="fas fa-fire-alt text-sports-neon mr-3"></i>
-        {% if request.args.get('sport') %}
-            {{ request.args.get('sport')|capitalize }} Matches
-        {% else %}
-            Panel de Apuestas
-        {% endif %}
-    </h1>
-    <div class="flex space-x-2">
-        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all flex items-center">
-            <i class="fas fa-sync-alt mr-2"></i> Actualizar
-        </button>
-    </div>
-</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- LEFT SIDE: Matches Feed -->
+    <div class="md:col-span-3 space-y-8">
 
-    <!-- LEFT COLUMN: MATCHES OF THE DAY (NEW) -->
-    <div class="lg:col-span-2 space-y-6">
-
-        <!-- Live Matches Feed -->
-        <div class="bg-sports-card rounded-xl border border-slate-700 shadow-xl overflow-hidden">
-            <div class="bg-slate-800/50 px-6 py-4 border-b border-slate-700 flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-blue-400 uppercase tracking-wide">
-                    <i class="fas fa-calendar-day mr-2"></i> Encuentros de Hoy
-                </h2>
-                <span class="text-xs text-slate-400 bg-slate-700 px-2 py-1 rounded">Live Feed</span>
-            </div>
-
-            <div id="matches-container" class="p-6 space-y-4">
-                <!-- Matches will be loaded here via JS/Server -->
-                <div class="animate-pulse flex space-x-4">
-                    <div class="flex-1 space-y-4 py-1">
-                        <div class="h-4 bg-slate-700 rounded w-3/4"></div>
-                        <div class="space-y-2">
-                            <div class="h-4 bg-slate-700 rounded"></div>
-                            <div class="h-4 bg-slate-700 rounded w-5/6"></div>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-center text-gray-500 py-4">Cargando encuentros...</p>
+        <!-- Live Matches Header -->
+        <div class="flex items-center justify-between">
+            <h1 class="text-4xl font-black text-white tracking-tighter flex items-center">
+                <i class="fas fa-fire-alt text-neon-purple mr-4 animate-pulse"></i>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-neon-cyan to-blue-500">
+                    {% if request.args.get('sport') %}
+                        {{ request.args.get('sport')|capitalize }} Matches
+                    {% else %}
+                        Encuentros de Hoy
+                    {% endif %}
+                </span>
+            </h1>
+            <div class="flex space-x-4">
+                <button onclick="window.location.reload()" class="bg-glass-surface hover:bg-glass-border text-neon-cyan border border-glass-border font-bold py-2 px-6 rounded-full shadow-neon-cyan transition-all transform hover:scale-105">
+                    <i class="fas fa-sync-alt animate-spin-slow"></i>
+                </button>
             </div>
         </div>
 
-        <!-- History / Recent Analysis -->
-        <h2 class="text-xl font-bold text-gray-200 mt-8 mb-4">
-            <i class="fas fa-history mr-2 text-purple-400"></i> Historial Reciente
-        </h2>
-
-        {% for item in history %}
-        <div class="bg-sports-card rounded-xl border border-slate-700 shadow-lg p-6 hover:border-blue-500/50 transition-colors group">
-            <div class="flex justify-between items-start mb-4">
-                <span class="text-xs font-mono text-slate-400">{{ item.analysis.created_at.strftime('%H:%M %d/%m') }}</span>
-                <span class="px-2 py-1 rounded text-xs font-bold uppercase
-                    {% if item.analysis.input_type == 'image' %}bg-purple-900 text-purple-200{% else %}bg-blue-900 text-blue-200{% endif %}">
-                    {{ item.analysis.input_type }}
-                </span>
+        <!-- Matches Grid -->
+        <div id="matches-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Loading Skeleton -->
+            {% for i in range(4) %}
+            <div class="bg-off-black border border-glass-border rounded-2xl p-6 shadow-xl animate-pulse">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="w-24 h-4 bg-zinc-800 rounded"></div>
+                    <div class="w-12 h-4 bg-zinc-800 rounded"></div>
+                </div>
+                <div class="space-y-3">
+                    <div class="w-full h-8 bg-zinc-800 rounded"></div>
+                    <div class="w-2/3 h-8 bg-zinc-800 rounded"></div>
+                </div>
             </div>
+            {% endfor %}
+        </div>
 
-            {% if item.result is mapping and item.result.get('matches') %}
-                <div class="grid gap-4">
-                {% for match in item.result.matches %}
-                    <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-bold text-lg text-white">{{ match.teams }}</h3>
-                            <span class="text-sports-neon font-bold text-sm">{{ match.confidence }}</span>
-                        </div>
-                        <p class="text-sm text-slate-300 mb-3 leading-relaxed">{{ match.analysis }}</p>
+        <!-- History Section -->
+        <div class="pt-12">
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                <i class="fas fa-history text-neon-lime mr-3"></i>
+                Últimos Análisis
+            </h2>
 
-                        <div class="flex items-center space-x-2 text-sm font-semibold text-blue-400">
-                            <i class="fas fa-trophy"></i>
-                            <span>{{ match.prediction }}</span>
-                        </div>
+            <div class="space-y-6">
+            {% for item in history %}
+                <div class="relative group">
+                    <!-- Neon Border Effect -->
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-2xl blur opacity-20 group-hover:opacity-75 transition duration-500"></div>
 
-                        {% if match.betting_tips %}
-                        <div class="mt-3 pt-3 border-t border-slate-700">
-                            <div class="flex flex-wrap gap-2">
-                                {% for tip in match.betting_tips %}
-                                    <span class="px-2 py-1 bg-slate-700 text-slate-200 text-xs rounded-full border border-slate-600">
-                                        {{ tip }}
-                                    </span>
-                                {% endfor %}
+                    <div class="relative bg-off-black rounded-2xl border border-glass-border p-6 shadow-2xl">
+                        <div class="flex justify-between items-start mb-4 border-b border-glass-border pb-4">
+                            <div class="flex items-center space-x-3">
+                                <span class="bg-zinc-800 text-gray-300 text-xs font-mono px-3 py-1 rounded-full border border-zinc-700">
+                                    {{ item.analysis.created_at.strftime('%H:%M') }}
+                                </span>
+                                <span class="text-xs font-bold uppercase tracking-wider
+                                    {% if item.analysis.input_type == 'image' %}text-neon-purple{% else %}text-neon-cyan{% endif %}">
+                                    <i class="fas {% if item.analysis.input_type == 'image' %}fa-image{% else %}fa-keyboard{% endif %} mr-1"></i>
+                                    {{ item.analysis.input_type }}
+                                </span>
                             </div>
                         </div>
+
+                        {% if item.result is mapping and item.result.get('matches') %}
+                            <div class="grid gap-6 md:grid-cols-2">
+                            {% for match in item.result.matches %}
+                                <div class="bg-black/40 rounded-xl p-5 border border-zinc-800 hover:border-neon-cyan transition-colors">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h3 class="font-bold text-lg text-white truncate w-full">{{ match.teams }}</h3>
+                                        <span class="ml-2 bg-green-900/30 text-neon-lime px-2 py-1 rounded text-xs font-bold whitespace-nowrap border border-green-500/20">
+                                            {{ match.confidence }}
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-400 mb-4 line-clamp-3">{{ match.analysis }}</p>
+
+                                    <div class="flex items-center text-sm font-semibold text-neon-cyan mb-3">
+                                        <i class="fas fa-trophy mr-2 text-yellow-500"></i>
+                                        <span>{{ match.prediction }}</span>
+                                    </div>
+
+                                    {% if match.betting_tips %}
+                                    <div class="flex flex-wrap gap-2">
+                                        {% for tip in match.betting_tips %}
+                                            <span class="px-3 py-1 bg-zinc-900 text-gray-300 text-xs rounded-lg border border-zinc-700 hover:border-gray-500 transition-colors cursor-default">
+                                                {{ tip }}
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            </div>
+
+                            {% if item.result.get('parlay_suggestions') %}
+                            <div class="mt-6 bg-gradient-to-r from-green-900/10 to-blue-900/10 p-5 rounded-xl border border-neon-lime/20">
+                                <h3 class="font-bold text-neon-lime mb-3 text-sm uppercase tracking-wide">
+                                    <i class="fas fa-money-bill-wave mr-2"></i> Sugerencia de Parlay
+                                </h3>
+                                <ul class="space-y-2">
+                                    {% for parlay in item.result.parlay_suggestions %}
+                                        <li class="flex items-start text-sm text-gray-300">
+                                            <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                            <span>{{ parlay }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                        {% elif item.result is mapping and item.result.get('error') %}
+                            <div class="text-red-400 bg-red-900/10 p-4 rounded-xl border border-red-900/50">
+                                <i class="fas fa-exclamation-circle mr-2"></i> {{ item.result.error }}
+                            </div>
+                        {% else %}
+                            <div class="text-gray-300 text-sm whitespace-pre-wrap font-mono bg-black/50 p-5 rounded-xl border border-zinc-800">
+                                {{ item.result }}
+                            </div>
                         {% endif %}
                     </div>
-                {% endfor %}
-                </div>
-            {% elif item.result is mapping and item.result.get('error') %}
-                <div class="text-red-400 bg-red-900/20 p-4 rounded border border-red-800">
-                    {{ item.result.error }}
                 </div>
             {% else %}
-                <div class="text-slate-300 text-sm whitespace-pre-wrap font-mono bg-slate-800 p-4 rounded border border-slate-700">
-                    {{ item.result }}
+                <div class="text-center py-16 bg-off-black rounded-3xl border border-dashed border-zinc-800">
+                    <i class="fas fa-ghost text-6xl text-zinc-800 mb-4 animate-bounce"></i>
+                    <p class="text-zinc-600 font-medium">No hay análisis previos. ¡Comienza uno!</p>
                 </div>
-            {% endif %}
+            {% endfor %}
+            </div>
         </div>
-        {% else %}
-        <div class="text-center py-12 bg-sports-card rounded-xl border border-slate-700 border-dashed">
-            <i class="fas fa-ghost text-4xl text-slate-600 mb-4"></i>
-            <p class="text-slate-500">No hay análisis previos. ¡Comienza uno!</p>
-        </div>
-        {% endfor %}
     </div>
 
-    <!-- RIGHT COLUMN: ANALYSIS TOOLS -->
-    <div class="lg:col-span-1 space-y-6">
+    <!-- RIGHT SIDE: Analysis Panel (Sticky) -->
+    <div class="md:col-span-1">
+        <div class="sticky top-24 space-y-6">
 
-        <!-- Quick Stats -->
-        <div class="bg-gradient-to-br from-blue-900 to-slate-900 rounded-xl p-6 shadow-xl border border-blue-800 text-white relative overflow-hidden">
-            <div class="relative z-10">
-                <h3 class="text-lg font-bold mb-2">Probabilidad de Éxito IA</h3>
-                <div class="flex items-end">
-                    <span class="text-4xl font-extrabold text-sports-neon">87%</span>
-                    <span class="text-sm text-blue-200 mb-1 ml-2">últimas 24h</span>
-                </div>
-                <!-- Mini Chart Canvas -->
-                <canvas id="miniChart" height="60" class="mt-4"></canvas>
-            </div>
-            <i class="fas fa-brain absolute -bottom-4 -right-4 text-9xl text-white/5 transform rotate-12"></i>
-        </div>
+            <!-- Analysis Card -->
+            <div class="bg-off-black rounded-3xl border border-glass-border shadow-2xl p-6 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-neon-cyan/20 rounded-full blur-2xl group-hover:bg-neon-cyan/30 transition-all duration-500"></div>
 
-        <!-- New Analysis Form -->
-        <div class="bg-sports-card rounded-xl border border-slate-700 shadow-xl p-6 sticky top-6">
-            <h2 class="text-lg font-bold text-white mb-4 flex items-center">
-                <i class="fas fa-magic text-purple-400 mr-2"></i> Nuevo Análisis
-            </h2>
-            <form action="{{ url_for('analyze') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <h2 class="text-xl font-black text-white mb-6 flex items-center relative z-10">
+                    <i class="fas fa-robot text-neon-cyan mr-3 text-2xl"></i>
+                    IA ANALYZER
+                </h2>
 
-                <!-- Toggle Input Type -->
-                <div class="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
-                    <button type="button" onclick="showInput('image')" id="btn-image" class="flex-1 py-2 text-sm font-bold rounded text-white bg-blue-600 shadow-sm transition-all">
-                        <i class="fas fa-image mr-2"></i> Imagen
-                    </button>
-                    <button type="button" onclick="showInput('text')" id="btn-text" class="flex-1 py-2 text-sm font-bold rounded text-slate-400 hover:text-white transition-all">
-                        <i class="fas fa-font mr-2"></i> Texto
-                    </button>
-                </div>
+                <form action="{{ url_for('analyze') }}" method="POST" enctype="multipart/form-data" class="space-y-5 relative z-10">
 
-                <div id="input-image" class="block">
-                    <div class="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer relative group">
-                        <input type="file" name="image" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                        <i class="fas fa-cloud-upload-alt text-3xl text-slate-500 mb-2 group-hover:text-blue-400 transition-colors"></i>
-                        <p class="text-sm text-slate-400">Arrastra una imagen o clic aquí</p>
-                        <p class="text-xs text-slate-600 mt-1">Soporta PNG, JPG</p>
+                    <!-- Input Type Switcher -->
+                    <div class="grid grid-cols-2 gap-2 bg-black/50 p-1.5 rounded-xl border border-zinc-800">
+                        <button type="button" onclick="showInput('image')" id="btn-image" class="py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg text-black bg-neon-cyan shadow-neon-cyan transition-all transform hover:scale-105">
+                            <i class="fas fa-image mr-1"></i> Imagen
+                        </button>
+                        <button type="button" onclick="showInput('text')" id="btn-text" class="py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg text-gray-500 hover:text-white transition-all">
+                            <i class="fas fa-keyboard mr-1"></i> Texto
+                        </button>
                     </div>
-                </div>
 
-                <div id="input-text" class="hidden">
-                    <textarea name="text_input" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-32 text-sm" placeholder="Escribe tu consulta... Ej: ¿Quién gana el Liverpool vs City?"></textarea>
-                </div>
+                    <div id="input-image" class="block animate-fade-in">
+                        <label class="block w-full border-2 border-dashed border-zinc-700 rounded-2xl p-8 text-center hover:border-neon-cyan hover:bg-neon-cyan/5 transition-all cursor-pointer group-input">
+                            <input type="file" name="image" accept="image/*" class="hidden" onchange="previewImage(this)">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-zinc-600 mb-3 group-hover:text-neon-cyan transition-colors" id="upload-icon"></i>
+                            <p class="text-sm text-gray-400 font-medium group-hover:text-white" id="upload-text">Subir Screenshot</p>
+                            <p class="text-xs text-zinc-600 mt-2">JPG, PNG (Max 5MB)</p>
+                        </label>
+                    </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-lg shadow-lg transform active:scale-95 transition-all flex justify-center items-center">
-                    <span class="mr-2">ANALIZAR AHORA</span>
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </form>
+                    <div id="input-text" class="hidden animate-fade-in">
+                        <textarea name="text_input" class="w-full bg-black/50 border border-zinc-700 rounded-2xl p-4 text-white placeholder-zinc-600 focus:ring-2 focus:ring-neon-purple focus:border-transparent transition-all h-40 text-sm font-medium resize-none shadow-inner" placeholder="Pega aquí estadísticas, nombres de equipos o tu pregunta..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-500 hover:to-pink-500 text-white font-black py-4 px-6 rounded-xl shadow-lg transform hover:-translate-y-1 transition-all duration-300 flex justify-center items-center group-btn relative overflow-hidden">
+                        <span class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+                        <span class="relative z-10 flex items-center">
+                            GENERAR PREDICCIÓN <i class="fas fa-bolt ml-2 animate-pulse"></i>
+                        </span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Stats Widget -->
+            <div class="bg-gradient-to-br from-zinc-900 to-black rounded-3xl p-6 border border-zinc-800 shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Tasa de Acierto</h3>
+                    <span class="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded border border-green-500/20">+2.4%</span>
+                </div>
+                <div class="flex items-end space-x-2">
+                    <span class="text-5xl font-black text-white tracking-tighter">89<span class="text-2xl text-gray-500">%</span></span>
+                </div>
+                <div class="mt-4 h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-neon-cyan to-neon-lime w-[89%] shadow-[0_0_10px_rgba(6,182,212,0.5)]"></div>
+                </div>
+            </div>
+
         </div>
-
     </div>
 </div>
 
 <script>
-    // Toggle Logic
+    // Input Toggle Animation
     function showInput(type) {
+        const btnImage = document.getElementById('btn-image');
+        const btnText = document.getElementById('btn-text');
+        const divImage = document.getElementById('input-image');
+        const divText = document.getElementById('input-text');
+
         if(type === 'image') {
-            document.getElementById('input-image').classList.remove('hidden');
-            document.getElementById('input-text').classList.add('hidden');
-            document.getElementById('btn-image').classList.add('bg-blue-600', 'text-white', 'shadow-sm');
-            document.getElementById('btn-image').classList.remove('text-slate-400');
-            document.getElementById('btn-text').classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
-            document.getElementById('btn-text').classList.add('text-slate-400');
+            divImage.classList.remove('hidden');
+            divText.classList.add('hidden');
+
+            btnImage.className = "py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg text-black bg-neon-cyan shadow-neon-cyan transition-all transform hover:scale-105 flex-1";
+            btnText.className = "py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg text-gray-500 hover:text-white transition-all flex-1";
         } else {
-            document.getElementById('input-image').classList.add('hidden');
-            document.getElementById('input-text').classList.remove('hidden');
-            document.getElementById('btn-text').classList.add('bg-blue-600', 'text-white', 'shadow-sm');
-            document.getElementById('btn-text').classList.remove('text-slate-400');
-            document.getElementById('btn-image').classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
-            document.getElementById('btn-image').classList.add('text-slate-400');
+            divImage.classList.add('hidden');
+            divText.classList.remove('hidden');
+
+            btnText.className = "py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg text-black bg-neon-purple shadow-neon-purple transition-all transform hover:scale-105 flex-1";
+            btnImage.className = "py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg text-gray-500 hover:text-white transition-all flex-1";
         }
     }
 
-    // Load Matches logic (AJAX)
+    // Image Preview
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('upload-icon').className = "fas fa-check-circle text-4xl text-neon-lime mb-3 transition-colors";
+                document.getElementById('upload-text').textContent = input.files[0].name;
+                document.getElementById('upload-text').className = "text-sm text-neon-lime font-bold truncate px-4";
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Load Matches with Modern Card Design
     document.addEventListener('DOMContentLoaded', function() {
         const sport = new URLSearchParams(window.location.search).get('sport') || 'soccer';
         fetch(`/api/matches/${sport}`)
@@ -197,65 +249,78 @@
                 container.innerHTML = '';
 
                 if (data.matches && data.matches.length > 0) {
-                    data.matches.forEach(match => {
+                    data.matches.forEach((match, index) => {
+                        // Staggered animation delay
+                        const delay = index * 100;
                         const card = `
-                        <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 hover:bg-slate-750 transition-colors flex justify-between items-center group">
-                            <div class="flex-1">
-                                <div class="text-xs text-slate-400 mb-1 flex items-center">
-                                    <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
-                                    ${match.time}
-                                </div>
-                                <div class="font-bold text-white text-lg">${match.home_team} <span class="text-slate-500 text-sm mx-2">vs</span> ${match.away_team}</div>
-                                <div class="text-xs text-slate-500 mt-1">${match.league || 'League'}</div>
+                        <div class="group relative bg-off-black rounded-2xl border border-glass-border p-5 hover:border-zinc-600 transition-all hover:-translate-y-1 duration-300 shadow-xl animate-fade-in-up" style="animation-delay: ${delay}ms">
+                            <div class="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-chart-line text-zinc-700 group-hover:text-neon-cyan text-4xl transform rotate-12"></i>
                             </div>
-                            <button onclick="analyzeMatch('${match.home_team} vs ${match.away_team}')" class="ml-4 bg-slate-700 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors shadow-md group-hover:scale-105 transform duration-200" title="Analizar con IA">
-                                <i class="fas fa-bolt text-sports-neon"></i>
-                            </button>
+
+                            <div class="relative z-10">
+                                <div class="flex items-center space-x-2 mb-4">
+                                    <span class="flex h-2 w-2 relative">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                    </span>
+                                    <span class="text-xs font-mono text-red-400 font-bold tracking-wider">LIVE</span>
+                                    <span class="text-xs text-zinc-500 font-mono pl-2 border-l border-zinc-700">${match.time}</span>
+                                </div>
+
+                                <div class="space-y-3 mb-6">
+                                    <div class="flex justify-between items-center">
+                                        <h3 class="text-lg font-bold text-white group-hover:text-neon-cyan transition-colors">${match.home_team}</h3>
+                                        <span class="text-zinc-600 text-sm">HOME</span>
+                                    </div>
+                                    <div class="w-full h-px bg-zinc-800"></div>
+                                    <div class="flex justify-between items-center">
+                                        <h3 class="text-lg font-bold text-white group-hover:text-neon-purple transition-colors">${match.away_team}</h3>
+                                        <span class="text-zinc-600 text-sm">AWAY</span>
+                                    </div>
+                                </div>
+
+                                <button onclick="analyzeMatch('${match.home_team} vs ${match.away_team}')" class="w-full bg-zinc-900 hover:bg-white hover:text-black text-white font-bold py-3 px-4 rounded-xl transition-all border border-zinc-800 group-hover:border-white shadow-lg flex justify-between items-center">
+                                    <span>ANALIZAR PARTIDO</span>
+                                    <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
+                                </button>
+                            </div>
                         </div>
                         `;
                         container.innerHTML += card;
                     });
                 } else {
-                    container.innerHTML = '<p class="text-center text-slate-500">No hay partidos disponibles hoy.</p>';
+                    container.innerHTML = '<div class="col-span-2 text-center py-12 text-zinc-500">No hay partidos disponibles hoy.</div>';
                 }
             })
             .catch(err => {
                 console.error(err);
-                document.getElementById('matches-container').innerHTML = '<p class="text-center text-red-400">Error cargando partidos.</p>';
+                document.getElementById('matches-container').innerHTML = '<p class="text-center text-red-500 col-span-2">Error cargando datos.</p>';
             });
-
-        // Chart.js Mini Chart
-        const ctx = document.getElementById('miniChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
-                datasets: [{
-                    data: [65, 78, 75, 82, 85, 88, 87],
-                    borderColor: '#a3e635',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { display: false }, y: { display: false } }
-            }
-        });
     });
 
     function analyzeMatch(matchTitle) {
-        // Switch to text input
         showInput('text');
-        // Fill textarea
         const textarea = document.querySelector('textarea[name="text_input"]');
-        textarea.value = `Analiza el partido de hoy: ${matchTitle}. Dame predicciones, alineaciones probables y sugerencias de apuestas.`;
-        // Scroll to form
-        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        textarea.focus();
+        textarea.value = `Analiza el partido: ${matchTitle}. \n\nDame:\n1. Predicción Ganador\n2. % Probabilidad\n3. Alineaciones Clave\n4. Mejor Apuesta (Value Bet)`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Visual feedback
+        textarea.classList.add('ring-2', 'ring-neon-purple');
+        setTimeout(() => textarea.classList.remove('ring-2', 'ring-neon-purple'), 1000);
     }
 </script>
+
+<style>
+    @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fade-in-up 0.5s ease-out forwards;
+    }
+    .animate-spin-slow {
+        animation: spin 3s linear infinite;
+    }
+</style>
 {% endblock %}
