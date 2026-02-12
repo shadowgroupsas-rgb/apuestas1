@@ -7,7 +7,11 @@ from PIL import Image
 
 class SportsAI:
     def __init__(self):
-        pass
+        # 2026 Model Mapping
+        self.MODEL_MAPPING = {
+            'openai': 'gpt-4o', # Fallback for 'GPT-5' until public API access
+            'gemini': 'gemini-1.5-pro' # Fallback for 'Gemini 3.0' until public API access
+        }
 
     def encode_image(self, image_path):
         with open(image_path, "rb") as image_file:
@@ -83,8 +87,9 @@ class SportsAI:
             })
 
         try:
+            model = self.MODEL_MAPPING.get('openai', 'gpt-4o')
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model=model,
                 messages=messages,
                 response_format={"type": "json_object"}
             )
@@ -106,8 +111,9 @@ class SportsAI:
             "max_output_tokens": 4096,
         }
 
+        model_name = self.MODEL_MAPPING.get('gemini', 'gemini-1.5-pro')
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-pro", # Or gemini-pro-vision if older lib
+            model_name=model_name,
             generation_config=generation_config,
             system_instruction=system_prompt
         )
