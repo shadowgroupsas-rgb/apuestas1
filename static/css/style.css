@@ -1,1 +1,59 @@
-/* Custom styles */
+:root {
+    --bg-dark: #0f172a;
+    --bg-card: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-blue: #3b82f6;
+    --accent-green: #22c55e;
+    --accent-neon: #a3e635;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+}
+
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid #334155;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+.btn-neon {
+    background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.btn-neon:hover {
+    background: linear-gradient(135deg, #65a30d 0%, #4d7c0f 100%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}

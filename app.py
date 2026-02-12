@@ -5,6 +5,7 @@ from models import db, User, Settings, Analysis
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from ai_engine import SportsAI
+from sports_data import SportsData
 import json
 
 load_dotenv()
@@ -71,6 +72,12 @@ def dashboard():
         history.append({"analysis": a, "result": res})
 
     return render_template('dashboard.html', user=current_user, history=history)
+
+@app.route('/api/matches/<sport>')
+def get_matches(sport):
+    sd = SportsData()
+    matches = sd.get_matches(sport)
+    return {"matches": matches}
 
 @app.route('/analyze', methods=['POST'])
 @login_required

@@ -1,6 +1,13 @@
 # Plataforma de Apuestas Deportivas con IA
 
-Esta es una plataforma web para analizar encuentros deportivos usando OpenAI (GPT-4) o Google Gemini Pro Vision.
+Esta es una plataforma web para analizar encuentros deportivos usando OpenAI (GPT-4) o Google Gemini Pro Vision. Incluye un dashboard con tema oscuro y alimentación de datos de partidos en vivo.
+
+## Características
+
+- **Análisis con IA:** Predicciones, alineaciones y parleys usando ChatGPT o Gemini.
+- **Dashboard en Vivo:** Visualización de partidos del día (Fútbol, NBA, MLB).
+- **Tema Oscuro:** Interfaz profesional estilo "Casa de Apuestas".
+- **Auto-instalable:** Script de instalación de base de datos incluido.
 
 ## Instalación en cPanel / VPS
 
@@ -8,7 +15,7 @@ Esta es una plataforma web para analizar encuentros deportivos usando OpenAI (GP
 2. **Configurar Python:**
     - En cPanel, ve a "Setup Python App".
     - Crea una nueva aplicación.
-    - Selecciona la versión de Python recomendada (3.9+).
+    - Selecciona la versión de Python recomendada (3.10+).
     - El "Application startup file" debe ser `passenger_wsgi.py`.
     - La "Application Entry point" debe ser `application`.
 3. **Instalar Dependencias:**
@@ -16,16 +23,16 @@ Esta es una plataforma web para analizar encuentros deportivos usando OpenAI (GP
     - Ejecuta: `pip install -r requirements.txt`
 4. **Instalar Base de Datos:**
     - Ejecuta: `python install.py`
-    - Esto creará la base de datos `sports_ai.db` y el usuario **admin** con contraseña **admin123**.
+    - Esto creará la base de datos (carpeta `instance/sports_ai.db`) y el usuario **admin** con contraseña **admin123**.
 
 ## Uso
 
 1. Entra a tu dominio.
 2. Logueate con `admin` / `admin123`.
-3. Ve a la sección **Admin** (en el menú superior) y configura tus API Keys de OpenAI o Google Gemini.
-4. Ve al **Dashboard** y sube una imagen con los partidos del día o escribe tu consulta.
-5. La IA analizará la información y te dará predicciones.
+3. Ve a la sección **Admin** (en el menú lateral) y configura tus API Keys de OpenAI o Google Gemini.
+4. En el **Dashboard**, verás los partidos del día. Haz clic en el rayo (⚡) para analizar un partido específico.
+5. También puedes subir capturas de pantalla de casas de apuestas para que la IA las analice.
 
 ## Migración
 
-Para migrar a otro servidor, solo necesitas copiar toda la carpeta, incluyendo el archivo `sports_ai.db` (que contiene tus datos) y la carpeta `static/uploads`.
+Para migrar a otro servidor, solo necesitas copiar toda la carpeta, incluyendo la carpeta `instance/` (que contiene tu base de datos) y `static/uploads`.
