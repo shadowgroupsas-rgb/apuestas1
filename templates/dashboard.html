@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sports AI{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6 text-gray-800">Panel de Apuestas Deportivas</h1>
+
+<!-- Analysis Form -->
+<div class="bg-white p-6 rounded-lg shadow-md mb-8">
+    <h2 class="text-xl font-bold mb-4">Nuevo Análisis</h2>
+    <form action="{{ url_for('analyze') }}" method="POST" enctype="multipart/form-data">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-gray-700 font-bold mb-2">Subir Imagen (Horarios, Cuotas, Alineaciones)</label>
+                <input type="file" name="image" accept="image/*" class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label class="block text-gray-700 font-bold mb-2">O pegar Texto/Pregunta</label>
+                <textarea name="text_input" class="w-full border p-2 rounded h-24" placeholder="Ej: Analiza el partido Real Madrid vs Barcelona de hoy..."></textarea>
+            </div>
+        </div>
+        <button type="submit" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+            <i class="fas fa-magic mr-2"></i> Analizar con IA
+        </button>
+    </form>
+</div>
+
+<!-- History -->
+<h2 class="text-2xl font-bold mb-4 text-gray-800">Historial de Predicciones</h2>
+
+{% for item in history %}
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-l-4 border-blue-500">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <span class="text-sm text-gray-500">{{ item.analysis.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                <span class="ml-2 px-2 py-1 bg-gray-200 rounded text-xs uppercase font-bold">{{ item.analysis.input_type }}</span>
+            </div>
+        </div>
+
+        {% if item.result is mapping and item.result.get('error') %}
+            <div class="bg-red-100 text-red-700 p-4 rounded">
+                <strong>Error:</strong> {{ item.result.error }}
+                {% if item.result.raw_text %}
+                    <pre class="mt-2 text-xs whitespace-pre-wrap">{{ item.result.raw_text }}</pre>
+                {% endif %}
+            </div>
+        {% elif item.result is mapping %}
+            <!-- Matches -->
+            {% if item.result.get('matches') %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                {% for match in item.result.matches %}
+                    <div class="border rounded p-4 bg-gray-50">
+                        <h3 class="font-bold text-lg text-blue-900 mb-2">{{ match.teams }}</h3>
+                        <p class="text-sm text-gray-700 mb-2">{{ match.analysis }}</p>
+                        <div class="mb-2">
+                            <span class="font-bold">Predicción:</span> {{ match.prediction }}
+                            <span class="ml-2 text-green-600 font-bold">({{ match.confidence }})</span>
+                        </div>
+
+                        {% if match.betting_tips %}
+                        <div class="mt-2">
+                            <h4 class="font-bold text-xs uppercase text-gray-500">Tips de Apuesta:</h4>
+                            <ul class="list-disc list-inside text-sm text-gray-800">
+                                {% for tip in match.betting_tips %}
+                                    <li>{{ tip }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Parlays -->
+            {% if item.result.get('parlay_suggestions') %}
+                <div class="bg-green-50 p-4 rounded border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2"><i class="fas fa-money-bill-wave mr-2"></i>Sugerencias de Parleys</h3>
+                    <ul class="list-disc list-inside">
+                        {% for parlay in item.result.parlay_suggestions %}
+                            <li class="text-green-900">{{ parlay }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <!-- Fallback if mapping but no matches key -->
+            {% if not item.result.get('matches') and not item.result.get('parlay_suggestions') %}
+                 <div class="prose max-w-none">
+                    <pre class="whitespace-pre-wrap font-sans text-gray-800">{{ item.result }}</pre>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Fallback for unstructured text (string) -->
+            <div class="prose max-w-none">
+                <pre class="whitespace-pre-wrap font-sans text-gray-800">{{ item.result }}</pre>
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <p class="text-gray-500">No hay análisis recientes.</p>
+{% endfor %}
+
+{% endblock %}

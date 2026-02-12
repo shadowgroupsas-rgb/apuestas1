@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Sports AI{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6 text-gray-800">Administración</h1>
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-xl font-bold mb-4">Configuración de API</h2>
+    <form method="POST">
+        <div class="mb-4">
+            <label for="openai_key" class="block text-gray-700 font-bold mb-2">OpenAI API Key</label>
+            <input type="text" id="openai_key" name="openai_key" class="w-full border rounded px-3 py-2" value="{{ settings.openai_api_key or '' }}">
+        </div>
+        <div class="mb-4">
+            <label for="gemini_key" class="block text-gray-700 font-bold mb-2">Gemini API Key</label>
+            <input type="text" id="gemini_key" name="gemini_key" class="w-full border rounded px-3 py-2" value="{{ settings.gemini_api_key or '' }}">
+        </div>
+        <div class="mb-4">
+            <label for="provider" class="block text-gray-700 font-bold mb-2">Proveedor por defecto</label>
+            <select id="provider" name="provider" class="w-full border rounded px-3 py-2">
+                <option value="openai" {% if settings.default_provider == 'openai' %}selected{% endif %}>OpenAI (ChatGPT)</option>
+                <option value="gemini" {% if settings.default_provider == 'gemini' %}selected{% endif %}>Google Gemini</option>
+            </select>
+        </div>
+        <div class="mb-6">
+            <label for="system_prompt" class="block text-gray-700 font-bold mb-2">System Prompt (Instrucciones para la IA)</label>
+            <textarea id="system_prompt" name="system_prompt" class="w-full border rounded px-3 py-2 h-32">{{ settings.system_prompt or '' }}</textarea>
+        </div>
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Guardar Configuración
+        </button>
+    </form>
+</div>
+{% endblock %}
